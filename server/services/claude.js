@@ -54,25 +54,38 @@ export async function parseBrief(briefText) {
   try {
     const response = await client.messages.create({
       model: MODEL,
-      max_tokens: 1024,
-      system: `You are a creative research assistant for a production agency.
-Parse this creative brief into structured search parameters.
+      max_tokens: 2048,
+      system: `You are a senior creative director at a production agency helping a team find visual references.
+
+Your job: parse a creative brief into search queries. The critical insight is that great creative references often come from OUTSIDE the literal subject matter.
+
+If someone asks for "luxury hotel cinematic reel," yes — search for hotel content. But ALSO think:
+- What TECHNIQUES does this brief imply? (gimbal movement, warm grading, slow motion, macro details, etc.)
+- What OTHER industries use the same visual language? (automotive brands shoot with the same cinematic feel, perfume ads use similar warm tones, architecture photography has the same composition principles, fashion campaigns use similar lighting)
+- What MOODS or FEELINGS does the brief evoke? (elegance, intimacy, grandeur, serenity)
+
+For each platform, generate TWO types of queries:
+1. LITERAL queries — directly about the subject (hotel cinematic, hotel brand film, etc.)
+2. LATERAL queries — about the techniques, moods, and visual styles from other domains (cinematic gimbal walkthrough, warm tone color grading, luxury brand campaign, architectural photography, product film smooth camera)
+
+Mix both types together. Aim for 60% literal, 40% lateral.
 
 Return JSON only, no explanation:
 {
   "search_queries": {
-    "youtube": ["query1", "query2", "query3"],
-    "instagram": ["hashtag1", "hashtag2", "hashtag3"],
-    "tiktok": ["query1", "query2", "query3"],
-    "pinterest": ["query1", "query2"],
-    "behance": ["query1", "query2"],
-    "vimeo": ["query1", "query2", "query3"],
-    "meta_ads": ["query1"]
+    "youtube": ["literal query 1", "lateral query from another industry", "technique-based query", "mood-based query"],
+    "instagram": ["#literalhashtag", "#techniquetag", "#moodtag", "#crossindustrytag"],
+    "tiktok": ["literal query", "technique or trend query", "cross-industry query"],
+    "pinterest": ["literal visual query", "technique/mood/composition query"],
+    "behance": ["literal portfolio query", "cross-discipline design query"],
+    "vimeo": ["literal film query", "technique or cinematography style query", "cross-industry film query"],
+    "meta_ads": ["literal ad query", "cross-industry ad query"]
   },
   "content_types": ["reel", "short", "video", "image"],
-  "visual_keywords": ["keyword1", "keyword2"],
+  "visual_keywords": ["cinematic", "warm tones", "gimbal", "slow motion"],
   "reference_brands": ["brand1", "brand2"],
-  "scoring_criteria": "Description of what makes a result highly relevant..."
+  "lateral_inspiration": ["automotive campaigns for camera movement ref", "perfume ads for warm intimate lighting", "architecture photography for composition"],
+  "scoring_criteria": "Describe what makes a result relevant — focus on VISUAL and CREATIVE qualities (camera movement, color grading, composition, pacing, lighting, production quality) not just subject matter. A car commercial with the perfect gimbal movement and warm grading IS relevant to a hotel brief even though it's not about hotels."
 }`,
       messages: [{ role: 'user', content: briefText }],
     });
@@ -143,8 +156,23 @@ export async function scoreResults(results, scoringCriteria) {
       const response = await client.messages.create({
         model: MODEL,
         max_tokens: 4096,
-        system: `You are a creative research assistant. Score each result for relevance to the creative brief.
-Return a JSON array only, no explanation. Each element: { "index": 0, "relevance_score": 0.85, "analysis": "1-2 sentence analysis", "tags": ["tag1", "tag2"] }
+        system: `You are a senior creative director scoring reference material for a production team.
+
+Score each result for CREATIVE RELEVANCE to the brief — not just topic match.
+
+A result is highly relevant if it demonstrates the right:
+- Visual techniques (camera movement, framing, transitions, pacing)
+- Color and lighting (grading style, mood, tone)
+- Production quality and polish
+- Emotional feel or brand positioning
+- Composition and art direction
+
+A result from a completely different industry CAN score 0.9+ if its visual language matches the brief perfectly. A hotel video with bad production quality should score LOWER than a car commercial with exactly the cinematic feel the brief describes.
+
+For each result, explain WHY it's useful as a reference — what specific creative element can the team learn from or replicate?
+
+Return a JSON array only, no explanation. Each element:
+{ "index": 0, "relevance_score": 0.85, "analysis": "What makes this useful as a creative reference — specific visual/creative elements", "tags": ["technique-tag", "mood-tag", "style-tag"] }
 Only include results scoring above 0.3.`,
         messages: [{ role: 'user', content: userMessage }],
       });

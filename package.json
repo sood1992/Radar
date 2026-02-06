@@ -1,0 +1,35 @@
+{
+  "name": "neofox-creative-radar",
+  "version": "1.0.0",
+  "description": "Creative research tool for Neofox Media — search 7 platforms with AI-powered brief parsing and scoring",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,green \"node server/index.js\" \"vite\"",
+    "build": "vite build",
+    "start": "NODE_ENV=production node server/index.js",
+    "db:init": "node server/db-init.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "apify-client": "^2.11.0",
+    "better-sqlite3": "^11.7.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "googleapis": "^144.0.0",
+    "node-fetch": "^3.3.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.1.1",
+    "vimeo": "^2.1.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.2",
+    "tailwindcss": "^4.0.0",
+    "vite": "^6.0.7"
+  }
+}
